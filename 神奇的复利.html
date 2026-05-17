@@ -1,0 +1,1168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>复利觉醒 · 让时间为你工作</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F5F7FA;--surface:#FFFFFF;--surface-2:#EEF2F7;--surface-3:#E1E7F0;
+  --ink:#0B2545;--ink-2:#1E3A6B;--ink-3:#4A5D7A;--muted:#8896AB;
+  --border:#E1E7F0;--border-strong:#C5D0DE;
+  --accent:#E85D3F;--accent-soft:#FFF0EB;--accent-deep:#B83D24;
+  --green:#1A8A5C;--green-soft:#E1F5EC;--green-deep:#0F5C3D;
+  --gold:#C19A4B;--gold-soft:#F7EFD9;--gold-deep:#8A6B2E;
+  --shadow-sm:0 1px 2px rgba(11,37,69,.05);
+  --shadow:0 1px 3px rgba(11,37,69,.06),0 8px 24px -8px rgba(11,37,69,.08);
+  --shadow-lg:0 4px 16px rgba(11,37,69,.08),0 24px 48px -16px rgba(11,37,69,.12);
+}
+*,*::before,*::after{box-sizing:border-box}
+*{margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:"Manrope",-apple-system,system-ui,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.serif{font-family:"Newsreader",Georgia,serif;font-optical-sizing:auto}
+
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select{font-family:inherit;color:inherit}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+
+/* ============ nav ============ */
+nav.top{background:var(--ink);color:#fff;padding:14px 0}
+nav.top .inner{max-width:1240px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center}
+nav.top .brand{font-family:"Newsreader",serif;font-size:18px;font-weight:500;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+nav.top .brand .mark{width:26px;height:26px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:"JetBrains Mono",monospace}
+nav.top .links{display:flex;gap:28px;font-size:13px;color:rgba(255,255,255,.7)}
+
+/* ============ hero ============ */
+.hero{background:linear-gradient(160deg,#0B2545 0%,#1E3A6B 100%);color:#fff;padding:64px 0 110px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-30%;right:-15%;width:55%;height:140%;background:radial-gradient(ellipse,rgba(232,93,63,.14) 0%,transparent 65%);pointer-events:none}
+.hero::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:60px;background:var(--bg);clip-path:polygon(0 100%,100% 100%,100% 0)}
+.hero .inner{max-width:1240px;margin:0 auto;padding:0 32px;position:relative}
+.hero .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:18px}
+.hero h1{font-family:"Newsreader",serif;font-weight:300;font-size:clamp(34px,4.8vw,56px);line-height:1.06;letter-spacing:-.02em;max-width:860px;font-variation-settings:"opsz" 60}
+.hero h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.hero p.lead{margin-top:18px;max-width:600px;color:rgba(255,255,255,.78);font-size:15px;line-height:1.65}
+
+/* ============ page ============ */
+.page{max-width:1240px;margin:0 auto;padding:0 32px}
+
+/* ============ calc card ============ */
+.calc{background:var(--surface);border-radius:14px;box-shadow:var(--shadow-lg);margin-top:-70px;position:relative;z-index:2;overflow:hidden}
+.calc-grid{display:grid;grid-template-columns:380px 1fr}
+
+/* inputs panel */
+.inputs{padding:32px;background:var(--surface);border-right:1px solid var(--border)}
+.inputs h2{font-family:"Newsreader",serif;font-size:22px;font-weight:400;letter-spacing:-.01em;margin-bottom:4px}
+.inputs .sub{color:var(--muted);font-size:12px;margin-bottom:24px}
+
+.field-group{padding-top:20px;margin-top:20px;border-top:1px solid var(--border)}
+.field-group:first-of-type{padding-top:0;margin-top:0;border-top:0}
+.group-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:14px}
+
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;color:var(--ink-3);font-weight:500;margin-bottom:6px}
+.field label .hint{color:var(--muted);font-weight:400;margin-left:6px;font-size:11px}
+
+.input-wrap{position:relative;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;transition:all .15s;display:flex;align-items:center}
+.input-wrap:focus-within{border-color:var(--ink);background:var(--surface);box-shadow:0 0 0 3px rgba(11,37,69,.07)}
+.input-wrap .prefix{padding-left:12px;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:13px;flex-shrink:0}
+.input-wrap input{font-family:"JetBrains Mono",monospace;font-size:14px;background:transparent;border:0;padding:10px 12px;width:100%;color:var(--ink);font-variant-numeric:tabular-nums;outline:none;font-weight:600}
+.input-wrap .suffix{padding-right:12px;color:var(--muted);font-size:11px;flex-shrink:0;font-family:"JetBrains Mono",monospace}
+
+.slider-block{background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:12px 14px}
+.slider-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.slider-head .val{font-family:"JetBrains Mono",monospace;font-size:17px;font-weight:700;color:var(--ink)}
+.slider-head .val .u{font-size:11px;color:var(--muted);margin-left:4px;font-weight:500}
+.slider-head .max{font-size:10px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;background:var(--border-strong);outline:none;border-radius:2px;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--ink);border-radius:50%;cursor:pointer;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--ink),0 2px 4px rgba(11,37,69,.2);transition:transform .1s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--ink);border-radius:50%;cursor:pointer;border:3px solid var(--surface)}
+
+.surplus-box{background:var(--green-soft);border:1px solid rgba(26,138,92,.22);border-radius:7px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;transition:all .2s}
+.surplus-box.warn{background:var(--accent-soft);border-color:rgba(232,93,63,.28)}
+.surplus-box .lab{font-size:12px;color:var(--ink-2);font-weight:500}
+.surplus-box .v{font-family:"JetBrains Mono",monospace;font-size:17px;font-weight:700;color:var(--green-deep)}
+.surplus-box.warn .v{color:var(--accent-deep)}
+
+/* result panel */
+.result{padding:36px;background:linear-gradient(180deg,var(--surface) 0%,#FAFBFD 100%);display:flex;flex-direction:column;gap:24px}
+
+.total-block{}
+.total-block .lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+.total-block .val{font-family:"Newsreader",serif;font-weight:400;font-size:clamp(38px,4.8vw,56px);line-height:1;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums;font-variation-settings:"opsz" 60}
+.total-block .val .curr{color:var(--muted);font-size:.5em;font-weight:300;margin-right:6px;vertical-align:.22em}
+.total-block .sub{font-size:13px;color:var(--ink-3);margin-top:10px;font-family:"JetBrains Mono",monospace}
+.total-block .sub .pos{color:var(--green);font-weight:700}
+
+.chart-container{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:var(--shadow-sm)}
+.chart-container .ch-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.chart-container h3{font-family:"Newsreader",serif;font-size:17px;font-weight:500;letter-spacing:-.005em}
+.chart-container .ch-meta{font-size:11px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+.chart-wrap{position:relative;height:280px}
+.chart-wrap.tall{height:340px}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:12px}
+.chart-legend .it{display:flex;align-items:center;gap:8px;color:var(--ink-3)}
+.chart-legend .sw{width:12px;height:12px;border-radius:3px}
+.chart-legend .sw.line{height:2.5px;width:20px;border-radius:1px}
+.chart-legend .sw.dash{height:0;width:20px;border-top:2px dashed currentColor;border-radius:0}
+
+/* stats grid below chart */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow-sm)}
+.stat-card .lab{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+.stat-card .v{font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700;color:var(--ink);line-height:1.1}
+.stat-card .v.green{color:var(--green)}
+.stat-card .v.gold{color:var(--gold-deep)}
+.stat-card .v.accent{color:var(--accent-deep)}
+
+/* ============ section ============ */
+.section{margin-top:56px}
+.sec-head{margin-bottom:24px;max-width:780px}
+.sec-head .eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px}
+.sec-head h2{font-family:"Newsreader",serif;font-size:clamp(26px,3.2vw,36px);font-weight:400;letter-spacing:-.02em;line-height:1.12;font-variation-settings:"opsz" 60}
+.sec-head h2 em{font-style:italic;color:var(--ink-2)}
+.sec-head p{margin-top:10px;color:var(--ink-3);font-size:14px;line-height:1.7}
+
+/* ============ portfolio ============ */
+.portfolio{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;box-shadow:var(--shadow-sm)}
+.port-summary{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;padding:18px 22px;background:linear-gradient(135deg,#0B2545 0%,#1E3A6B 100%);color:#fff;border-radius:10px;margin-bottom:24px;position:relative;overflow:hidden}
+.port-summary::before{content:"";position:absolute;right:-30px;top:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(232,93,63,.16) 0%,transparent 70%);pointer-events:none}
+.port-summary .l .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:700;margin-bottom:4px}
+.port-summary .l .v{font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:700}
+.port-summary .alloc-bar{height:10px;border-radius:5px;overflow:hidden;background:rgba(255,255,255,.12);display:flex;position:relative}
+.port-summary .alloc-bar div{transition:width .3s ease}
+.port-summary .r{position:relative;text-align:right}
+.port-summary .r .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:700;margin-bottom:4px}
+.port-summary .r .v{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:600}
+
+.assets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.asset{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:16px;transition:all .15s;display:flex;flex-direction:column;gap:0}
+.asset:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.asset.active{border-color:var(--ink);background:var(--surface);box-shadow:var(--shadow-sm)}
+
+.asset-head{display:flex;align-items:center;gap:12px}
+.asset-logo{width:36px;height:36px;flex-shrink:0;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.asset-logo svg{width:100%;height:100%;display:block}
+.asset-info{flex:1;min-width:0}
+.asset-info .nm{font-size:14px;font-weight:700;color:var(--ink);line-height:1.2}
+.asset-info .sub{font-size:11px;color:var(--muted);margin-top:2px}
+.asset-ret{text-align:right;flex-shrink:0}
+.asset-ret .v{font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:700;color:var(--green)}
+.asset-ret .v.extreme{color:var(--accent)}
+.asset-ret .v.low{color:var(--muted)}
+.asset-ret .l{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-top:1px}
+
+.asset-action{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:center}
+.asset .add-btn{width:100%;padding:8px 12px;border:1px dashed var(--border-strong);border-radius:6px;color:var(--ink-3);font-size:12px;font-weight:600;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.asset .add-btn:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-2)}
+.asset .add-btn::before{content:"+";font-size:14px;font-weight:400}
+
+.asset.active .asset-action{flex-direction:column;gap:8px;align-items:stretch}
+.asset .pct-row{display:flex;justify-content:space-between;align-items:center;width:100%}
+.asset .pct-row .lab{font-size:11px;color:var(--ink-3);font-weight:600;letter-spacing:.05em}
+.asset .pct-row .pct{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700;color:var(--ink)}
+.asset .pct-slider{width:100%}
+.asset .remove-btn{width:100%;padding:6px;border-radius:5px;color:var(--muted);font-size:11px;font-weight:600;transition:all .15s}
+.asset .remove-btn:hover{background:var(--accent-soft);color:var(--accent-deep)}
+
+.warn-banner{margin-top:14px;padding:12px 14px;border-radius:7px;background:var(--accent-soft);border-left:3px solid var(--accent);color:var(--accent-deep);font-size:12px;line-height:1.55;display:flex;gap:8px;align-items:flex-start}
+.warn-banner::before{content:"⚠";flex-shrink:0;font-size:14px}
+
+.helper-hint{font-size:11px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.5}
+
+/* ============ yearly table ============ */
+.yearly-table{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.yearly-table .scroll-x{overflow-x:auto}
+.yearly-table table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+.yearly-table thead{background:var(--surface-2);border-bottom:1px solid var(--border)}
+.yearly-table th{text-align:right;padding:14px 16px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.yearly-table th:first-child{text-align:left}
+.yearly-table td{padding:11px 16px;text-align:right;font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--border);color:var(--ink-2);font-weight:500}
+.yearly-table td:first-child{text-align:left;color:var(--ink);font-weight:700}
+.yearly-table tbody tr:hover{background:var(--surface-2)}
+.yearly-table tr.highlight td{background:linear-gradient(90deg,var(--accent-soft) 0%,transparent 60%);font-weight:700;color:var(--ink)}
+.yearly-table tr.highlight td:first-child{position:relative}
+.yearly-table tr.highlight td:first-child::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.yearly-table td.gain{color:var(--green);font-weight:700}
+.yearly-table td.total{color:var(--ink);font-weight:700}
+.tab-meta{padding:14px 18px;background:var(--surface-2);border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.tab-toggle{color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.02em}
+.tab-toggle:hover{color:var(--accent)}
+
+/* ============ milestones ============ */
+.milestones{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.milestone{padding:18px 20px;border:1px solid var(--border);border-radius:9px;background:var(--surface);position:relative;overflow:hidden;box-shadow:var(--shadow-sm)}
+.milestone.hit{border-color:var(--green);background:var(--green-soft)}
+.milestone.hit::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}
+.milestone .lab{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+.milestone.hit .lab{color:var(--green)}
+.milestone .v{font-family:"Newsreader",serif;font-size:22px;font-weight:500;letter-spacing:-.01em;color:var(--ink);line-height:1.1}
+.milestone .v small{font-family:"Manrope";font-size:13px;color:var(--muted);margin-left:3px;font-weight:500}
+.milestone .v.dim{color:var(--muted);font-style:italic;font-size:15px}
+
+.freedom{margin-top:18px;padding:24px 28px;background:linear-gradient(135deg,#0B2545 0%,#1E3A6B 100%);color:#fff;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.freedom::before{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(232,93,63,.22) 0%,transparent 70%);pointer-events:none}
+.freedom .l{font-family:"Newsreader",serif;font-size:17px;font-weight:300;line-height:1.45;max-width:540px;position:relative}
+.freedom .l em{color:var(--accent);font-style:italic;font-weight:400}
+.freedom .r{text-align:right;position:relative}
+.freedom .r .num{font-family:"Newsreader",serif;font-size:32px;font-weight:500;letter-spacing:-.01em;line-height:1}
+.freedom .r .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.65;margin-top:6px;font-weight:600}
+.freedom.dim{background:var(--surface-2);color:var(--ink-3);border:1px dashed var(--border-strong)}
+.freedom.dim::before{display:none}
+.freedom.dim .l em{color:var(--ink-2)}
+
+/* ============ latte ============ */
+.latte{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;box-shadow:var(--shadow-sm)}
+.latte-rows{display:flex;flex-direction:column;gap:10px}
+.latte-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--border);border-radius:9px;background:var(--surface);transition:all .15s}
+.latte-row:hover{border-color:var(--border-strong);background:#FAFBFD}
+.latte-row .emoji{width:38px;height:38px;flex-shrink:0;background:var(--surface-2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.latte-row .info strong{display:block;font-size:14px;color:var(--ink);font-weight:700}
+.latte-row .info span{font-size:11px;color:var(--muted)}
+
+.latte-row .input-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;width:130px;transition:all .15s}
+.latte-row .input-cell:focus-within{border-color:var(--ink);background:var(--surface);box-shadow:0 0 0 3px rgba(11,37,69,.07)}
+.latte-row .input-cell .pre{padding-left:10px;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:13px}
+.latte-row .input-cell input{font-family:"JetBrains Mono",monospace;font-size:14px;background:transparent;border:0;padding:8px 4px;width:100%;outline:none;text-align:right;font-weight:700;color:var(--ink)}
+.latte-row .input-cell .suf{padding-right:10px;color:var(--muted);font-size:10px;font-family:"JetBrains Mono",monospace}
+
+.latte-row .arrow{color:var(--muted);font-size:18px;font-weight:300;line-height:1;width:24px;text-align:center}
+
+.latte-row .cost{min-width:120px;text-align:right}
+.latte-row .cost .v{font-family:"JetBrains Mono",monospace;font-size:18px;color:var(--accent-deep);font-weight:700;line-height:1.1}
+.latte-row .cost .s{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+
+.latte-total{margin-top:18px;padding:24px 28px;background:linear-gradient(135deg,#0B2545 0%,#1E3A6B 100%);border-radius:10px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.latte-total::before{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at top right,rgba(232,93,63,.18) 0%,transparent 60%);pointer-events:none}
+.latte-total .l{font-family:"Newsreader",serif;font-size:17px;font-weight:300;font-style:italic;line-height:1.45;max-width:480px;position:relative}
+.latte-total .r{position:relative;text-align:right}
+.latte-total .r .num{font-family:"Newsreader",serif;font-size:44px;font-weight:500;color:var(--accent);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;font-variation-settings:"opsz" 60}
+.latte-total .r .lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.7;margin-top:6px;font-weight:600}
+
+/* ============ edu ============ */
+.edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.edu-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;transition:all .15s;box-shadow:var(--shadow-sm)}
+.edu-card:hover{border-color:var(--border-strong);transform:translateY(-2px);box-shadow:var(--shadow)}
+.edu-card .num{font-family:"Newsreader",serif;font-size:30px;font-weight:300;font-style:italic;color:var(--accent);line-height:1;letter-spacing:-.02em;font-variation-settings:"opsz" 60}
+.edu-card h4{font-family:"Newsreader",serif;font-size:17px;font-weight:500;margin:8px 0;color:var(--ink)}
+.edu-card p{font-size:13px;color:var(--ink-3);line-height:1.65}
+
+/* ============ footer ============ */
+footer{margin-top:80px;background:var(--ink);color:rgba(255,255,255,.7);padding:48px 0 28px}
+footer .inner{max-width:1240px;margin:0 auto;padding:0 32px}
+footer h4{font-family:"Newsreader",serif;font-size:17px;font-weight:500;color:#fff;margin-bottom:12px}
+footer .formula{font-family:"JetBrains Mono",monospace;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:7px;margin:12px 0 18px;color:rgba(255,255,255,.9);font-size:12px;overflow-x:auto;white-space:nowrap}
+footer p{font-size:13px;line-height:1.7;max-width:920px;margin-bottom:8px}
+footer p strong{color:#fff;font-weight:600}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;margin-bottom:28px}
+footer .copy{font-size:11px;color:rgba(255,255,255,.42);padding-top:24px;border-top:1px solid rgba(255,255,255,.12);letter-spacing:.05em}
+
+/* ============ responsive ============ */
+@media (max-width:1024px){
+  .calc-grid{grid-template-columns:1fr}
+  .inputs{border-right:0;border-bottom:1px solid var(--border)}
+  footer .cols{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .page{padding:0 16px}
+  nav.top .inner{padding:0 16px}
+  nav.top .links{display:none}
+  .hero{padding:48px 0 90px}
+  .hero .inner{padding:0 16px}
+  .inputs,.result{padding:24px}
+  .portfolio,.latte{padding:20px}
+  .port-summary{grid-template-columns:1fr;gap:16px}
+  .stats-grid{grid-template-columns:1fr}
+  .latte-row{grid-template-columns:auto 1fr;gap:10px}
+  .latte-row .input-cell{grid-column:1/-1;width:100%}
+  .latte-row .arrow{display:none}
+  .latte-row .cost{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:8px}
+  footer .inner{padding:0 16px}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both}
+.d1{animation-delay:.08s}
+.d2{animation-delay:.16s}
+.d3{animation-delay:.24s}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="inner">
+    <div class="brand"><span class="mark">¥</span>复利觉醒</div>
+    <div class="links"><span>计算器</span><span>资产库</span><span>关于复利</span></div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="inner">
+    <div class="eyebrow">复利计算器 · The Eighth Wonder</div>
+    <h1>让<em>时间</em>替你赚钱<br>而不是替你<em>逝去</em>。</h1>
+    <p class="lead">基于真实历史回报率，按月迭代计算你的资产增长曲线。把每个月省下来的钱投进 8 种真实资产，看 30 年后会变成什么样——这不是预测，是数学。</p>
+  </div>
+</section>
+
+<div class="page">
+
+  <!-- =========== MAIN CALC =========== -->
+  <div class="calc fade">
+    <div class="calc-grid">
+
+      <!-- INPUTS -->
+      <div class="inputs">
+        <h2>方案设定</h2>
+        <p class="sub">所有数字实时刷新</p>
+
+        <div class="field-group">
+          <div class="group-label">月度收支</div>
+          <div class="field">
+            <label>每月收入</label>
+            <div class="input-wrap"><span class="prefix">¥</span><input type="number" id="income" value="15000" min="0" step="100"><span class="suffix">/月</span></div>
+          </div>
+          <div class="field">
+            <label>必要支出 <span class="hint">房租、餐饮、通勤</span></label>
+            <div class="input-wrap"><span class="prefix">¥</span><input type="number" id="must" value="3000" min="0" step="100"><span class="suffix">/月</span></div>
+          </div>
+          <div class="field">
+            <label>可选支出</label>
+            <div class="input-wrap"><span class="prefix">¥</span><input type="number" id="want" value="5000" min="0" step="100"><span class="suffix">/月</span></div>
+          </div>
+          <div class="surplus-box" id="surplus-box">
+            <span class="lab">可投资盈余</span>
+            <span class="v" id="surplus-v">¥7,000</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="group-label">定投设置</div>
+          <div class="field">
+            <label>每月定投金额</label>
+            <div class="slider-block">
+              <div class="slider-head">
+                <div class="val"><span id="dca-v">¥5,000</span><span class="u">/ 月</span></div>
+                <div class="max">盈余 <span id="dca-max">¥7,000</span></div>
+              </div>
+              <input type="range" id="dca" min="0" max="20000" step="100" value="5000">
+            </div>
+          </div>
+          <div class="field">
+            <label>定投年限</label>
+            <div class="slider-block">
+              <div class="slider-head">
+                <div class="val"><span id="years-v">30</span><span class="u">年</span></div>
+                <div class="max">1 — 50 年</div>
+              </div>
+              <input type="range" id="years" min="1" max="50" step="1" value="30">
+            </div>
+          </div>
+          <div class="field">
+            <label>初始本金 <span class="hint">如果你已经有积蓄</span></label>
+            <div class="input-wrap"><span class="prefix">¥</span><input type="number" id="init" value="0" min="0" step="1000"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result">
+        <div class="total-block">
+          <div class="lab">Total Balance · 资产终值</div>
+          <div class="val"><span class="curr">¥</span><span id="total-v">0</span></div>
+          <div class="sub" id="total-sub">第 30 年末 · 收益 <span class="pos" id="total-gain">+¥0</span></div>
+        </div>
+
+        <div class="chart-container">
+          <div class="ch-head">
+            <h3>逐年资产构成</h3>
+            <div class="ch-meta">月度迭代 · <span id="meta-months">360</span> 期</div>
+          </div>
+          <div class="chart-wrap tall"><canvas id="mainChart"></canvas></div>
+          <div class="chart-legend">
+            <div class="it"><span class="sw" style="background:#C19A4B"></span>累计本金</div>
+            <div class="it"><span class="sw" style="background:#1A8A5C"></span>复利收益</div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="lab">累计投入</div><div class="v" id="stat-principal">¥0</div></div>
+          <div class="stat-card"><div class="lab">复利收益</div><div class="v green" id="stat-earnings">¥0</div></div>
+          <div class="stat-card"><div class="lab">收益倍数</div><div class="v gold" id="stat-multiple">—</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========== PORTFOLIO =========== -->
+  <div class="section fade d1">
+    <div class="sec-head">
+      <div class="eyebrow">选择资产</div>
+      <h2>组合你的<em>投资标的</em></h2>
+      <p>勾选你想投资的资产，调整每个的占比。所有资产的占比加起来自动等于 100%，组合预期年化会立即反映到上方计算。</p>
+    </div>
+    <div class="portfolio">
+      <div class="port-summary">
+        <div class="l">
+          <div class="lab">组合预期年化</div>
+          <div class="v" id="port-cagr">13.0%</div>
+        </div>
+        <div class="alloc-bar" id="alloc-bar"></div>
+        <div class="r">
+          <div class="lab">已选 / 占比</div>
+          <div class="v" id="port-count">1 项 · 100%</div>
+        </div>
+      </div>
+      <div class="assets-grid" id="assets"></div>
+      <div class="warn-banner" id="warn-banner" style="display:none">英伟达 / 比特币这类资产过去 10 年回报极端，回撤可超 80%，不能按此速率简单外推 30 年。本工具仅作教育演示。</div>
+      <div class="helper-hint">💡 拖动占比滑杆会按比例自动调整其他资产，保持总和 100%</div>
+    </div>
+  </div>
+
+  <!-- =========== YEARLY TABLE =========== -->
+  <div class="section fade d2">
+    <div class="sec-head">
+      <div class="eyebrow">复利可视化</div>
+      <h2>每一年的<em>账本</em></h2>
+      <p>看清复利如何一年一年地把"收益"变成"本金的本金"。最具说服力的是中段：当年度利息首次超过年度投入、当总额首次破百万——这就是复利的具象时刻。</p>
+    </div>
+    <div class="yearly-table">
+      <div class="scroll-x">
+        <table>
+          <thead>
+            <tr>
+              <th>年份</th>
+              <th>年初本金</th>
+              <th>累计定投</th>
+              <th>当年利息</th>
+              <th>资金总额</th>
+            </tr>
+          </thead>
+          <tbody id="yearly-body"></tbody>
+        </table>
+      </div>
+      <div class="tab-meta">
+        <span>高亮行 = 资产首次突破百万的年份</span>
+        <button class="tab-toggle" id="tab-toggle">展开全部 ↓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== COMPARISON =========== -->
+  <div class="section fade d2">
+    <div class="sec-head">
+      <div class="eyebrow">同样的钱，不同的人生</div>
+      <h2>三条路径的<em>差距</em></h2>
+      <p>把每月那笔钱花光、存银行、还是定投——50 年后差距是几个数量级。这张图不是为了让你焦虑，是为了让你看见选择的代价。</p>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrap tall"><canvas id="cmpChart"></canvas></div>
+      <div class="chart-legend">
+        <div class="it" style="color:#B83D24"><span class="sw dash" style="color:#E85D3F"></span>月光（钱花光了）</div>
+        <div class="it"><span class="sw line" style="background:#C19A4B"></span>银行定期 2%</div>
+        <div class="it"><span class="sw line" style="background:#1A8A5C"></span>你的投资组合 <span class="mono" id="cmp-pct" style="color:var(--green);font-weight:700;margin-left:4px"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== MILESTONES =========== -->
+  <div class="section fade d3">
+    <div class="sec-head">
+      <div class="eyebrow">关键节点</div>
+      <h2>资产<em>里程碑</em></h2>
+      <p>复利的奇迹不是最终的数字，而是数字跨越每一道门槛所需要的时间。第一个 100 万最难，之后越来越快。</p>
+    </div>
+    <div class="milestones" id="milestones"></div>
+    <div class="freedom" id="freedom-box">
+      <div class="l" id="freedom-text">— 财务自由临界点：账户产生的月收益超过工资 —</div>
+      <div class="r"><div class="num" id="freedom-time">—</div><div class="lab" id="freedom-sub">—</div></div>
+    </div>
+  </div>
+
+  <!-- =========== LATTE =========== -->
+  <div class="section fade d3">
+    <div class="sec-head">
+      <div class="eyebrow">机会成本</div>
+      <h2>被你忽略的<em>每月小钱</em></h2>
+      <p>每一项日常消费，按你的组合预期年化跑 <span id="latte-years-inline">30</span> 年，得到它真正的"机会成本"——你正在用未来的资产换今天的多巴胺。</p>
+    </div>
+    <div class="latte">
+      <div class="latte-rows" id="latte-rows"></div>
+      <div class="latte-total">
+        <div class="l">如果把以上全部省下并按你的组合定投——</div>
+        <div class="r"><div class="num" id="latte-total">¥0</div><div class="lab">机会成本 · <span id="latte-years">30</span> 年</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== EDU =========== -->
+  <div class="section fade d3">
+    <div class="sec-head">
+      <div class="eyebrow">最大化复利的策略</div>
+      <h2>复利不是<em>金融魔法</em><br>而是耐心 × 时间</h2>
+    </div>
+    <div class="edu-grid">
+      <div class="edu-card"><div class="num">01</div><h4>尽早开始</h4><p>25 岁开始 vs 35 岁开始，同样月投 5000，终值差距超过 60%。复利对起点的敏感度远超你的想象。</p></div>
+      <div class="edu-card"><div class="num">02</div><h4>定期定额</h4><p>定期追加让每一笔新钱都参与下一期复利。坚持比金额更重要——一年存 6 万比偶尔存 10 万效果好。</p></div>
+      <div class="edu-card"><div class="num">03</div><h4>分红再投</h4><p>把利息、股息、分红立即再投资，让"赚的钱"也变成"赚钱的本钱"。这是复利与单利的根本区别。</p></div>
+      <div class="edu-card"><div class="num">04</div><h4>记住 72 法则</h4><p>资产翻倍年数 ≈ 72 ÷ 年化收益率%。10% 回报，7.2 年翻倍；7% 回报，10 年翻倍。这是心算工具。</p></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="inner">
+    <div class="cols">
+      <div>
+        <h4>计算引擎说明</h4>
+        <p>本工具使用<strong>月度迭代复利</strong>模型，比"年初一次性投入"的简化算法精确得多：</p>
+        <div class="formula">月利率 r<sub>m</sub> = (1 + 年化)<sup>1/12</sup> − 1 &nbsp; · &nbsp; B<sub>new</sub> = (B<sub>old</sub> + 月定投) × (1 + r<sub>m</sub>)</div>
+        <p>每月把新定投加入本金，整体乘以 (1 + 月利率)，循环到第 600 期。闭式解和迭代解经独立校验完全一致。</p>
+      </div>
+      <div>
+        <h4>免责声明</h4>
+        <p>历史年化数据参考截至 2024 年的 10 年期 CAGR。过去业绩<strong>不代表未来表现</strong>。本工具是财商教育玩具，不是投资建议。把 NVDA 或 BTC 过去 10 年的极端回报外推到未来 50 年，数学合法、现实荒谬。请用它建立储蓄习惯，而非规划暴富路径。</p>
+      </div>
+    </div>
+    <div class="copy">© 复利觉醒 · 灵感来自 StashAway · 以教育为目的，非投资建议</div>
+  </div>
+</footer>
+
+<script>
+// ===========================================================
+//  ASSETS + LOGOS (SVG inline)
+// ===========================================================
+function makeLogo(bg,text,size,textColor){
+  textColor = textColor || '#fff';
+  return `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="16" fill="${bg}"/><text x="16" y="${16 + size/3 + 1}" text-anchor="middle" font-family="Manrope, sans-serif" font-size="${size}" font-weight="800" fill="${textColor}">${text}</text></svg>`;
+}
+
+const ASSETS = [
+  {id:'SPY',  name:'标普 500',     sub:'美股宽基指数 · S&P 500', ret:0.13, risk:'med',     logo:makeLogo('#DC2626','S&P',10)},
+  {id:'QQQ',  name:'纳斯达克 100', sub:'美股科技指数 · QQQ',     ret:0.17, risk:'med',     logo:makeLogo('#2563EB','Q',16)},
+  {id:'AAPL', name:'苹果 AAPL',    sub:'巨头型科技股',           ret:0.25, risk:'high',    logo:makeLogo('#111111','A',16)},
+  {id:'NVDA', name:'英伟达 NVDA',  sub:'AI 芯片 · 极高波动',     ret:0.65, risk:'extreme', logo:makeLogo('#76B900','N',16)},
+  {id:'BTC',  name:'比特币 BTC',   sub:'加密原生 · 极高波动',    ret:0.50, risk:'extreme', logo:makeLogo('#F7931A','₿',16)},
+  {id:'GOLD', name:'黄金 GLD',     sub:'避险资产',               ret:0.07, risk:'low',     logo:makeLogo('#D4AF37','Au',11)},
+  {id:'BOND', name:'美债 10Y',     sub:'美国国债',               ret:0.04, risk:'low',     logo:makeLogo('#475569','$',15)},
+  {id:'TD',   name:'银行定期',     sub:'中国 5 年期存款',        ret:0.02, risk:'none',    logo:makeLogo('#1E3A6B','存',12)},
+];
+
+const RISK_COLOR = {extreme:'#E85D3F', high:'#1E3A6B', med:'#1A8A5C', low:'#C19A4B', none:'#8896AB'};
+
+// ===========================================================
+//  STATE
+// ===========================================================
+const state = {
+  income:15000, must:3000, want:5000,
+  dca:5000, years:30, init:0,
+  portfolio:{SPY:100},  // pct out of 100
+  tableExpanded:false,
+};
+
+const latteState = {
+  fortune:300, course:400, milktea:400, sub:200, shopping:500,
+};
+const LATTE_ITEMS = [
+  {id:'fortune', emoji:'🔮', label:'算命 / 玄学',  sub:'求心安的费用'},
+  {id:'course',  emoji:'📚', label:'知识付费课程', sub:'囤课不学'},
+  {id:'milktea', emoji:'🧋', label:'奶茶 / 咖啡',  sub:'每周 4 杯 × 25 元'},
+  {id:'sub',     emoji:'📱', label:'订阅 / 会员',  sub:'各类 App 累计'},
+  {id:'shopping',emoji:'🛍️', label:'冲动购物',     sub:'付款心动到货冷静'},
+];
+
+// ===========================================================
+//  UTILS
+// ===========================================================
+const $ = id => document.getElementById(id);
+const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
+
+function fmt(n){
+  if(!isFinite(n)) return '¥—';
+  const sign = n<0?'-':'';
+  return sign + '¥' + Math.round(Math.abs(n)).toLocaleString('en-US');
+}
+function fmtNum(n){
+  if(!isFinite(n)) return '—';
+  return Math.round(n).toLocaleString('en-US');
+}
+function fmtShort(n){
+  n = Math.round(n);
+  if(n>=1e8) return '¥'+(n/1e8).toFixed(2)+'亿';
+  if(n>=1e4) return '¥'+(n/1e4).toFixed(1)+'万';
+  return '¥'+n.toLocaleString('en-US');
+}
+function pct(n){ return (n*100).toFixed(1)+'%'; }
+
+// ===========================================================
+//  COMPOUND ENGINE
+// ===========================================================
+function simulate(monthly, years, annualReturn, init){
+  init = init || 0;
+  const months = Math.max(1, Math.round(years*12));
+  const rm = Math.pow(1+annualReturn, 1/12) - 1;
+  let balance = init;
+  let principal = init;
+  const pts = [{m:0, y:0, balance, principal, earnings:0}];
+  for(let m=1; m<=months; m++){
+    balance = (balance + monthly) * (1 + rm);
+    principal += monthly;
+    pts.push({m, y:m/12, balance, principal, earnings:balance-principal});
+  }
+  return pts;
+}
+
+function portfolioReturn(){
+  const ids = Object.keys(state.portfolio);
+  if(ids.length===0) return 0;
+  return ids.reduce((s,id)=>{
+    const a = ASSETS.find(x=>x.id===id);
+    return s + (state.portfolio[id]/100) * a.ret;
+  }, 0);
+}
+
+function hasExtreme(){
+  return Object.keys(state.portfolio).some(id=>{
+    const a = ASSETS.find(x=>x.id===id);
+    return a && a.risk==='extreme' && state.portfolio[id]>0;
+  });
+}
+
+function firstHit(pts, target){
+  for(let i=0; i<pts.length; i++) if(pts[i].balance >= target) return pts[i];
+  return null;
+}
+
+function freedomPoint(pts, monthlyIncome, annualReturn){
+  if(monthlyIncome<=0 || annualReturn<=0) return null;
+  const rm = Math.pow(1+annualReturn, 1/12) - 1;
+  for(let i=0; i<pts.length; i++){
+    if(pts[i].balance * rm >= monthlyIncome) return pts[i];
+  }
+  return null;
+}
+
+// ===========================================================
+//  PORTFOLIO MANAGEMENT (auto-normalize to 100)
+// ===========================================================
+function addAsset(id){
+  const ids = Object.keys(state.portfolio);
+  if(ids.length === 0){
+    state.portfolio[id] = 100;
+  } else {
+    // give new asset an equal share, scale others
+    const equal = 100 / (ids.length + 1);
+    const scale = (100 - equal) / 100;
+    ids.forEach(i => state.portfolio[i] = state.portfolio[i] * scale);
+    state.portfolio[id] = equal;
+  }
+}
+
+function removeAsset(id){
+  if(!(id in state.portfolio)) return;
+  delete state.portfolio[id];
+  // re-normalize so sum stays 100
+  const ids = Object.keys(state.portfolio);
+  const sum = ids.reduce((s,i)=>s+state.portfolio[i], 0);
+  if(sum > 0){
+    ids.forEach(i => state.portfolio[i] = (state.portfolio[i]/sum) * 100);
+  }
+}
+
+function setPct(id, newPct){
+  newPct = clamp(newPct, 0, 100);
+  const others = Object.keys(state.portfolio).filter(i => i !== id);
+  if(others.length === 0){
+    state.portfolio[id] = 100;
+    return;
+  }
+  state.portfolio[id] = newPct;
+  const remaining = 100 - newPct;
+  const othersSum = others.reduce((s,i) => s + state.portfolio[i], 0);
+  if(othersSum > 0){
+    others.forEach(i => state.portfolio[i] = (state.portfolio[i]/othersSum) * remaining);
+  } else {
+    // others are all 0, distribute equally
+    others.forEach(i => state.portfolio[i] = remaining / others.length);
+  }
+}
+
+// ===========================================================
+//  RENDER: ASSETS
+// ===========================================================
+function renderAssets(){
+  const el = $('assets');
+  el.innerHTML = '';
+  ASSETS.forEach(a=>{
+    const active = a.id in state.portfolio;
+    const pctVal = active ? state.portfolio[a.id] : 0;
+    const retClass = a.risk==='extreme' ? 'extreme' : (a.risk==='none' || a.risk==='low' ? 'low' : '');
+    const div = document.createElement('div');
+    div.className = 'asset' + (active?' active':'');
+
+    let actionHTML;
+    if(active){
+      actionHTML = `
+        <div class="asset-action">
+          <div class="pct-row">
+            <span class="lab">投资占比</span>
+            <span class="pct">${Math.round(pctVal)}%</span>
+          </div>
+          <input type="range" class="pct-slider" min="0" max="100" step="1" value="${Math.round(pctVal)}" data-id="${a.id}">
+          <button class="remove-btn" data-rm="${a.id}">移除</button>
+        </div>`;
+    } else {
+      actionHTML = `<div class="asset-action"><button class="add-btn" data-add="${a.id}">加入组合</button></div>`;
+    }
+
+    div.innerHTML = `
+      <div class="asset-head">
+        <div class="asset-logo">${a.logo}</div>
+        <div class="asset-info">
+          <div class="nm">${a.name}</div>
+          <div class="sub">${a.sub}</div>
+        </div>
+        <div class="asset-ret">
+          <div class="v ${retClass}">${pct(a.ret)}</div>
+          <div class="l">历史年化</div>
+        </div>
+      </div>
+      ${actionHTML}
+    `;
+    el.appendChild(div);
+  });
+
+  // bind events
+  el.querySelectorAll('[data-add]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      addAsset(e.currentTarget.dataset.add);
+      renderAssets();
+      updateAll();
+    });
+  });
+  el.querySelectorAll('[data-rm]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      removeAsset(e.currentTarget.dataset.rm);
+      renderAssets();
+      updateAll();
+    });
+  });
+  el.querySelectorAll('.pct-slider').forEach(s => {
+    s.addEventListener('input', e => {
+      const id = e.currentTarget.dataset.id;
+      const v = parseFloat(e.currentTarget.value);
+      setPct(id, v);
+      // update sibling displays without re-render to keep slider focus
+      renderAssetPcts();
+      renderAllocBar();
+      updateNumbers();
+    });
+    s.addEventListener('change', e => {
+      // on release, re-render for clean state
+      renderAssets();
+    });
+  });
+}
+
+function renderAssetPcts(){
+  document.querySelectorAll('.asset.active').forEach(node => {
+    const slider = node.querySelector('.pct-slider');
+    if(!slider) return;
+    const id = slider.dataset.id;
+    const pctEl = node.querySelector('.pct');
+    if(id in state.portfolio && pctEl){
+      pctEl.textContent = Math.round(state.portfolio[id]) + '%';
+      // sync slider value if not currently being dragged for this one
+      if(document.activeElement !== slider){
+        slider.value = Math.round(state.portfolio[id]);
+      }
+    }
+  });
+}
+
+function renderAllocBar(){
+  const bar = $('alloc-bar');
+  bar.innerHTML = '';
+  const ids = Object.keys(state.portfolio);
+  ids.forEach(id => {
+    const a = ASSETS.find(x=>x.id===id);
+    const seg = document.createElement('div');
+    seg.style.width = state.portfolio[id] + '%';
+    seg.style.background = RISK_COLOR[a.risk];
+    seg.title = a.name + ': ' + Math.round(state.portfolio[id]) + '%';
+    bar.appendChild(seg);
+  });
+  $('warn-banner').style.display = hasExtreme() ? 'flex' : 'none';
+
+  const n = ids.length;
+  $('port-count').textContent = n + ' 项 · 100%';
+}
+
+// ===========================================================
+//  CHARTS
+// ===========================================================
+Chart.defaults.font.family = '"Manrope","JetBrains Mono",sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#4A5D7A';
+
+let mainChart, cmpChart;
+
+function initCharts(){
+  // Main chart: stacked area chart (principal + earnings = total)
+  mainChart = new Chart($('mainChart').getContext('2d'), {
+    type:'line',
+    data:{
+      labels:[],
+      datasets:[
+        {
+          label:'累计本金',
+          data:[],
+          borderColor:'#C19A4B',
+          backgroundColor:'rgba(193,154,75,.55)',
+          borderWidth:1.5,
+          pointRadius:0,
+          pointHoverRadius:4,
+          fill:'origin',
+          tension:.25,
+        },
+        {
+          label:'复利收益',
+          data:[],
+          borderColor:'#1A8A5C',
+          backgroundColor:'rgba(26,138,92,.45)',
+          borderWidth:1.5,
+          pointRadius:0,
+          pointHoverRadius:4,
+          fill:'-1',
+          tension:.25,
+        },
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      animation:{duration:400, easing:'easeOutCubic'},
+      plugins:{
+        legend:{display:false},
+        tooltip:tooltipOpts(true),
+      },
+      scales:{
+        x:{
+          stacked:false,
+          grid:{display:false},
+          ticks:{maxRotation:0, autoSkip:true, maxTicksLimit:10, color:'#8896AB', font:{size:10}},
+        },
+        y:{
+          stacked:true,
+          grid:{color:'rgba(225,231,240,.7)', drawBorder:false},
+          ticks:{color:'#8896AB', font:{size:10}, callback:v=>fmtShort(v)},
+        }
+      }
+    }
+  });
+
+  // Comparison chart
+  cmpChart = new Chart($('cmpChart').getContext('2d'), {
+    type:'line',
+    data:{
+      labels:[],
+      datasets:[
+        {label:'月光',     data:[], borderColor:'#E85D3F', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0, borderDash:[6,4]},
+        {label:'银行定期', data:[], borderColor:'#C19A4B', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:.25},
+        {label:'你的组合', data:[], borderColor:'#1A8A5C', backgroundColor:'rgba(26,138,92,.10)', borderWidth:2.5, pointRadius:0, tension:.25, fill:'origin'},
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      animation:{duration:400, easing:'easeOutCubic'},
+      plugins:{
+        legend:{display:false},
+        tooltip:tooltipOpts(false),
+      },
+      scales:{
+        x:{
+          grid:{display:false},
+          ticks:{maxRotation:0, autoSkip:true, maxTicksLimit:10, color:'#8896AB', font:{size:10}},
+        },
+        y:{
+          grid:{color:'rgba(225,231,240,.7)', drawBorder:false},
+          ticks:{color:'#8896AB', font:{size:10}, callback:v=>fmtShort(v)}
+        }
+      }
+    }
+  });
+}
+
+function tooltipOpts(showTotal){
+  return {
+    backgroundColor:'#0B2545',
+    titleColor:'#fff',
+    bodyColor:'rgba(255,255,255,.92)',
+    borderColor:'#1E3A6B',
+    borderWidth:1,
+    padding:12,
+    cornerRadius:7,
+    titleFont:{family:'"Newsreader",serif', size:13, weight:'500'},
+    bodyFont:{family:'"JetBrains Mono",monospace', size:12},
+    callbacks:{
+      title:items => '第 '+items[0].label+' 年',
+      label:c => '  '+c.dataset.label+': '+fmtShort(c.parsed.y),
+      footer: showTotal ? items => {
+        const sum = items.reduce((s,i)=>s+i.parsed.y, 0);
+        return '\n  总额: '+fmtShort(sum);
+      } : undefined,
+    },
+    footerFont:{family:'"JetBrains Mono",monospace', size:12, weight:'700'},
+    footerColor:'#E85D3F',
+  };
+}
+
+// ===========================================================
+//  RENDER: YEARLY TABLE, MILESTONES, FREEDOM
+// ===========================================================
+function renderYearlyTable(pts){
+  const body = $('yearly-body');
+  body.innerHTML = '';
+  const yearly = [];
+  for(let y=0; y<=state.years; y++){
+    const idx = y*12;
+    if(idx < pts.length) yearly.push(pts[idx]);
+  }
+  const millionHit = yearly.find(p => p.balance >= 1000000);
+  const millionYear = millionHit ? Math.ceil(millionHit.y) : -1;
+
+  let displayYears;
+  if(state.tableExpanded){
+    displayYears = yearly.slice(1); // skip y=0
+  } else {
+    const keys = new Set([1,3,5,10,15,20,25,30,35,40,45,50]);
+    if(millionYear > 0) keys.add(millionYear);
+    keys.add(state.years);
+    displayYears = yearly.filter(p => {
+      const y = Math.round(p.y);
+      return keys.has(y) && y > 0 && y <= state.years;
+    });
+  }
+
+  displayYears.forEach(p => {
+    const tr = document.createElement('tr');
+    const yearNum = Math.round(p.y);
+    if(millionYear > 0 && yearNum === millionYear) tr.className = 'highlight';
+    const yearStart = yearNum > 0 ? yearly[yearNum-1].balance : (state.init || 0);
+    const yearContrib = state.dca * 12;
+    const yearInterest = p.balance - yearStart - yearContrib;
+    tr.innerHTML = `
+      <td>第 ${yearNum} 年</td>
+      <td>${fmtNum(yearStart)}</td>
+      <td>${fmtNum(p.principal - (state.init||0))}</td>
+      <td class="gain">+${fmtNum(yearInterest)}</td>
+      <td class="total">${fmtNum(p.balance)}</td>
+    `;
+    body.appendChild(tr);
+  });
+
+  $('tab-toggle').textContent = state.tableExpanded ? '收起 ↑' : '展开全部 ↓';
+}
+
+function renderMilestones(pts){
+  const targets = [
+    {v:100000,   label:'10 万'},
+    {v:500000,   label:'50 万'},
+    {v:1000000,  label:'100 万'},
+    {v:3000000,  label:'300 万'},
+    {v:10000000, label:'1000 万'},
+  ];
+  const el = $('milestones');
+  el.innerHTML = '';
+  targets.forEach(t => {
+    const hit = firstHit(pts, t.v);
+    const div = document.createElement('div');
+    div.className = 'milestone' + (hit?' hit':'');
+    if(hit){
+      const yrs = Math.floor(hit.y);
+      const mos = Math.round((hit.y - yrs) * 12);
+      div.innerHTML = `<div class="lab">¥ ${t.label}</div><div class="v">${yrs}<small>年</small>${mos>0?' '+mos+'<small>月</small>':''}</div>`;
+    } else {
+      div.innerHTML = `<div class="lab">¥ ${t.label}</div><div class="v dim">未达成</div>`;
+    }
+    el.appendChild(div);
+  });
+}
+
+function renderFreedom(pts, wr){
+  const fp = freedomPoint(pts, state.income, wr);
+  const box = $('freedom-box');
+  if(fp){
+    box.classList.remove('dim');
+    const yrs = Math.floor(fp.y);
+    const mos = Math.round((fp.y - yrs) * 12);
+    $('freedom-text').innerHTML = '<em>财务自由临界点</em> — 此刻账户产生的月收益已经超过你的工资，理论上可以不上班了。';
+    $('freedom-time').textContent = `${yrs} 年 ${mos} 月`;
+    $('freedom-sub').textContent = '资产 ' + fmtShort(fp.balance);
+  } else {
+    box.classList.add('dim');
+    $('freedom-text').innerHTML = '<em>在当前方案的时间窗口内</em>，月度收益尚未超过工资。延长年限或提高定投，再试一次。';
+    $('freedom-time').textContent = '—';
+    $('freedom-sub').textContent = '未达成';
+  }
+}
+
+// ===========================================================
+//  RENDER: LATTE
+// ===========================================================
+function renderLatte(){
+  const el = $('latte-rows');
+  el.innerHTML = '';
+  LATTE_ITEMS.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'latte-row';
+    row.innerHTML = `
+      <div class="emoji">${it.emoji}</div>
+      <div class="info"><strong>${it.label}</strong><span>${it.sub}</span></div>
+      <div class="input-cell">
+        <span class="pre">¥</span>
+        <input type="number" data-l="${it.id}" value="${latteState[it.id]}" min="0" step="50">
+        <span class="suf">/月</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="cost" data-c="${it.id}"><div class="v">¥—</div><div class="s">— 年后</div></div>
+    `;
+    el.appendChild(row);
+    row.querySelector('input').addEventListener('input', e => {
+      latteState[it.id] = Math.max(0, parseFloat(e.target.value)||0);
+      updateLatte();
+    });
+  });
+}
+
+function updateLatte(){
+  const wr = portfolioReturn();
+  let total = 0;
+  LATTE_ITEMS.forEach(it => {
+    const monthly = latteState[it.id] || 0;
+    const pts = simulate(monthly, state.years, wr, 0);
+    const cost = pts[pts.length-1].balance;
+    total += cost;
+    const cell = document.querySelector(`[data-c="${it.id}"]`);
+    if(cell) cell.innerHTML = `<div class="v">${fmtShort(cost)}</div><div class="s">${state.years} 年后</div>`;
+  });
+  $('latte-total').textContent = fmtShort(total);
+}
+
+// ===========================================================
+//  MAIN UPDATE
+// ===========================================================
+function updateNumbers(){
+  // surplus
+  const surplus = state.income - state.must - state.want;
+  $('surplus-v').textContent = fmt(surplus);
+  $('surplus-box').classList.toggle('warn', surplus <= 0);
+  $('dca-max').textContent = fmt(Math.max(0, surplus));
+  $('dca').max = Math.max(2000, Math.max(0,surplus)*2 + 5000);
+
+  // slider values
+  $('dca-v').textContent = fmt(state.dca);
+  $('years-v').textContent = state.years;
+  $('meta-months').textContent = state.years * 12;
+  $('latte-years').textContent = state.years;
+  $('latte-years-inline').textContent = state.years;
+
+  const wr = portfolioReturn();
+  $('port-cagr').textContent = wr > 0 ? pct(wr) : '0.0%';
+  $('cmp-pct').textContent = wr > 0 ? '('+pct(wr)+')' : '';
+
+  // main simulation
+  const pts = simulate(state.dca, state.years, wr, state.init);
+  const final = pts[pts.length-1];
+
+  $('total-v').textContent = fmtNum(final.balance);
+  $('total-sub').innerHTML = '第 ' + state.years + ' 年末 · 收益 <span class="pos" id="total-gain">+' + fmt(final.earnings) + '</span>';
+  $('stat-principal').textContent = fmtShort(final.principal);
+  $('stat-earnings').textContent = fmtShort(final.earnings);
+  const mult = final.principal > 0 ? (final.balance / final.principal).toFixed(2) : '—';
+  $('stat-multiple').textContent = mult + '×';
+
+  return {pts, wr, final};
+}
+
+function updateCharts(pts, wr){
+  // yearly points
+  const yearlyPts = [];
+  for(let y=1; y<=state.years; y++){
+    const idx = y*12;
+    if(idx < pts.length) yearlyPts.push(pts[idx]);
+  }
+  const labels = yearlyPts.map(p => Math.round(p.y));
+
+  // main chart: stacked principal + earnings
+  mainChart.data.labels = labels;
+  mainChart.data.datasets[0].data = yearlyPts.map(p => p.principal);
+  mainChart.data.datasets[1].data = yearlyPts.map(p => p.earnings);
+  mainChart.update('none');
+
+  // comparison chart
+  const ptsTD = simulate(state.dca, state.years, 0.02, state.init);
+  const yearlyTD = [];
+  for(let y=1; y<=state.years; y++){
+    const idx = y*12;
+    if(idx < ptsTD.length) yearlyTD.push(ptsTD[idx]);
+  }
+  cmpChart.data.labels = labels;
+  cmpChart.data.datasets[0].data = labels.map(_ => 0);
+  cmpChart.data.datasets[1].data = yearlyTD.map(p => p.balance);
+  cmpChart.data.datasets[2].data = yearlyPts.map(p => p.balance);
+  cmpChart.update('none');
+}
+
+function updateAll(){
+  renderAllocBar();
+  const {pts, wr} = updateNumbers();
+  updateCharts(pts, wr);
+  renderYearlyTable(pts);
+  renderMilestones(pts);
+  renderFreedom(pts, wr);
+  updateLatte();
+}
+
+// ===========================================================
+//  BIND
+// ===========================================================
+function bind(){
+  ['income','must','want','dca','years','init'].forEach(k => {
+    $(k).addEventListener('input', e => {
+      state[k] = parseFloat(e.target.value) || 0;
+      updateAll();
+    });
+  });
+  $('tab-toggle').addEventListener('click', () => {
+    state.tableExpanded = !state.tableExpanded;
+    const pts = simulate(state.dca, state.years, portfolioReturn(), state.init);
+    renderYearlyTable(pts);
+  });
+}
+
+// ===========================================================
+//  INIT
+// ===========================================================
+initCharts();
+renderAssets();
+renderLatte();
+bind();
+updateAll();
+</script>
+
+</body>
+</html>
