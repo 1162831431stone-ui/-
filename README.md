@@ -6,7 +6,7 @@
 
 ## 🔗 在线体验 (Live Demo)
 
-**[https://1162831431stone-ui.github.io/-/]（神奇的复利）**
+**[https://1162831431stone-ui.github.io/-/]**
 
 ## ✨ 核心功能 (Features)
 
